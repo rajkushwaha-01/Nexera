@@ -1,0 +1,38 @@
+{
+  "name": "project-monitor-server",
+  "version": "1.0.0",
+  "description": "Backend API for Web-Based Integrated Project-Monitoring Platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node tests/test-auth.js && node tests/test-projects-tasks.js && node tests/test-phase3.js && node tests/test-phase4.js && node tests/test-phase5-hardening.js",
+    "test:auth": "node tests/test-auth.js",
+    "test:projects": "node tests/test-projects-tasks.js",
+    "test:phase3": "node tests/test-phase3.js",
+    "test:phase4": "node tests/test-phase4.js",
+    "test:phase5": "node tests/test-phase5-hardening.js"
+  },
+  "keywords": [
+    "project-management",
+    "student-planner",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.3"
+  }
+}
