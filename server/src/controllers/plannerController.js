@@ -101,6 +101,12 @@ const updateAssignment = asyncHandler(async (req, res) => {
     }
   });
 
+  if (updates.deadline !== undefined) {
+    updates.deadlineReminder24Sent = false;
+    updates.deadlineReminder1hSent = false;
+    updates.lastNotifiedDeadline = null;
+  }
+
   const updatedAssignment = await Assignment.findOneAndUpdate(
     { _id: id, student: req.user.id },
     { $set: updates },
@@ -214,6 +220,12 @@ const updateExam = asyncHandler(async (req, res) => {
       updates[field] = req.body[field];
     }
   });
+
+  if (updates.examDate !== undefined) {
+    updates.deadlineReminder24Sent = false;
+    updates.deadlineReminder1hSent = false;
+    updates.lastNotifiedDeadline = null;
+  }
 
   const updatedExam = await Exam.findOneAndUpdate(
     { _id: id, student: req.user.id },

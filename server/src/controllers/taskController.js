@@ -219,6 +219,17 @@ const updateTask = asyncHandler(async (req, res) => {
     updates.status = 'In Progress';
   }
 
+  // Reset deadline reminder flags if due date changes
+  if (updates.dueDate !== undefined) {
+    const existingDueTime = task.dueDate ? new Date(task.dueDate).getTime() : null;
+    const newDueTime = updates.dueDate ? new Date(updates.dueDate).getTime() : null;
+    if (existingDueTime !== newDueTime) {
+      updates.deadlineReminder24Sent = false;
+      updates.deadlineReminder1hSent = false;
+      updates.lastNotifiedDeadline = null;
+    }
+  }
+
   const updatedTask = await Task.findByIdAndUpdate(id, { $set: updates }, { new: true, runValidators: true })
     .populate('assignedTo', 'name email avatar role')
     .populate('createdBy', 'name email avatar role');

@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node tests/test-auth.js && node tests/test-projects-tasks.js && node tests/test-phase3.js && node tests/test-phase4.js && node tests/test-phase5-hardening.js",
+    "test": "node tests/test-auth.js && node tests/test-projects-tasks.js && node tests/test-phase3.js && node tests/test-phase4.js && node tests/test-phase5-hardening.js && node tests/test-notifications.js",
     "test:auth": "node tests/test-auth.js",
     "test:projects": "node tests/test-projects-tasks.js",
     "test:phase3": "node tests/test-phase3.js",
     "test:phase4": "node tests/test-phase4.js",
-    "test:phase5": "node tests/test-phase5-hardening.js"
+    "test:phase5": "node tests/test-phase5-hardening.js",
+    "test:notifications": "node tests/test-notifications.js"
   },
   "keywords": [
     "project-management",
@@ -30,7 +31,8 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "nodemailer": "^10.0.0"
   },
   "devDependencies": {
     "mongodb-memory-server": "^10.1.3"

@@ -228,6 +228,12 @@ const updateProject = asyncHandler(async (req, res) => {
     updates.members = Array.from(memberSet);
   }
 
+  if (updates.deadline !== undefined) {
+    updates.deadlineReminder24Sent = false;
+    updates.deadlineReminder1hSent = false;
+    updates.lastNotifiedDeadline = null;
+  }
+
   const updatedProject = await Project.findByIdAndUpdate(id, { $set: updates }, { new: true, runValidators: true })
     .populate('owner', 'name email avatar role')
     .populate('members', 'name email avatar role');

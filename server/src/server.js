@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const app = require('./app');
 const { connectDB, disconnectDB } = require('./config/db');
+const { startScheduler, stopScheduler } = require('./services/reminderScheduler');
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,6 +19,9 @@ let server;
 const startServer = async () => {
   try {
     await connectDB();
+
+    // Start background automated deadline reminder scheduler
+    startScheduler();
 
     server = app.listen(PORT, () => {
       console.log(`=========================================`);
@@ -48,7 +52,8 @@ process.on('unhandledRejection', (err) => {
 
 // Handle graceful shutdown signals
 const gracefulShutdown = async (signal) => {
-  console.log(`\n[Process] ${signal} signal received. Closing HTTP server and DB connections...`);
+  console.log(`\n[Process] ${signal} signal received. Closing HTTP server, scheduler, and DB connections...`);
+  stopScheduler();
   if (server) {
     server.close(async () => {
       await disconnectDB();

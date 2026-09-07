@@ -58,6 +58,18 @@ const projectSchema = new mongoose.Schema(
     isArchived: {
       type: Boolean,
       default: false
+    },
+    deadlineReminder24Sent: {
+      type: Boolean,
+      default: false
+    },
+    deadlineReminder1hSent: {
+      type: Boolean,
+      default: false
+    },
+    lastNotifiedDeadline: {
+      type: Date,
+      default: null
     }
   },
   {

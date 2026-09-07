@@ -64,6 +64,18 @@ const taskSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Creator is required']
+    },
+    deadlineReminder24Sent: {
+      type: Boolean,
+      default: false
+    },
+    deadlineReminder1hSent: {
+      type: Boolean,
+      default: false
+    },
+    lastNotifiedDeadline: {
+      type: Date,
+      default: null
     }
   },
   {

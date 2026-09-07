@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -12,13 +14,14 @@ const taskRoutes = require('./routes/taskRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const plannerRoutes = require('./routes/plannerRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const docRoutes = require('./routes/docRoutes');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
 // Security HTTP headers
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 
 // Request logging
 if (process.env.NODE_ENV !== 'test') {
@@ -63,9 +66,22 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/planner', plannerRoutes);
+app.use('/api/notifications', notificationRoutes);
 
-// Root informational endpoint
+// Serve frontend static assets if built
+const clientDistPath = path.join(__dirname, '../../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath, { index: false }));
+}
+
+// Root informational endpoint & browser entry point
 app.get('/', (req, res) => {
+  // If a browser is accessing root, serve the SPA client
+  if (req.headers.accept && req.headers.accept.includes('text/html') && fs.existsSync(path.join(clientDistPath, 'index.html'))) {
+    return res.sendFile(path.join(clientDistPath, 'index.html'));
+  }
+
+  // API clients, curl, and automated test suites receive JSON status
   res.json({
     name: 'Web-Based Integrated Project-Monitoring Platform API',
     version: '1.0.0',
@@ -76,6 +92,20 @@ app.get('/', (req, res) => {
 });
 
 // 404 Handler for undefined API routes
+app.all('/api/*', (req, res, next) => {
+  next(new AppError(`Cannot find ${req.method} ${req.originalUrl} on this server`, 404));
+});
+
+// Single Page Application (SPA) routing fallback: send index.html for all non-API GET routes
+app.get('*', (req, res, next) => {
+  const indexPath = path.join(clientDistPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  next(new AppError(`Cannot find ${req.method} ${req.originalUrl} on this server`, 404));
+});
+
+// 404 Handler for undefined non-GET requests (e.g. POST to unknown path)
 app.all('*', (req, res, next) => {
   next(new AppError(`Cannot find ${req.method} ${req.originalUrl} on this server`, 404));
 });

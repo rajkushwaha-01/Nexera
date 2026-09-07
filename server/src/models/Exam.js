@@ -49,6 +49,18 @@ const examSchema = new mongoose.Schema(
         message: '{VALUE} is not a valid exam status'
       },
       default: 'Upcoming'
+    },
+    deadlineReminder24Sent: {
+      type: Boolean,
+      default: false
+    },
+    deadlineReminder1hSent: {
+      type: Boolean,
+      default: false
+    },
+    lastNotifiedDeadline: {
+      type: Date,
+      default: null
     }
   },
   {
