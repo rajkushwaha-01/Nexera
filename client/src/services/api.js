@@ -10,6 +10,11 @@ const api = axios.create({
 // Attach Bearer token to outgoing requests
 api.interceptors.request.use(
   (config) => {
+    // Prevent accidental /api/api duplication if /api is included in URL
+    if (config.url && config.url.startsWith('/api/')) {
+      config.url = config.url.replace(/^\/api\//, '/');
+    }
+
     const token = localStorage.getItem('planpulse_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

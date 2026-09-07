@@ -23,9 +23,9 @@ const startServer = async () => {
     // Start background automated deadline reminder scheduler
     startScheduler();
 
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`=========================================`);
-      console.log(`🚀 Project Monitor Server Running on port ${PORT}`);
+      console.log(`🚀 Nexera running on port ${PORT}`);
       console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 Health: http://localhost:${PORT}/api/health`);
       console.log(`=========================================`);

@@ -31,27 +31,56 @@ if (process.env.NODE_ENV !== 'test') {
 // Global API rate limiting
 app.use('/api', apiLimiter);
 
-// CORS setup
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'http://localhost:3000',
-  'http://127.0.0.1:5173'
-];
+// CORS setup (supports single-domain Render deployment, CLIENT_URL, and local dev)
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173'
+  ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, Postman)
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
-        return callback(null, true);
+  const origin = req.headers.origin;
+
+  // Allow requests with no origin (e.g. mobile apps, curl, Postman, internal calls)
+  if (!origin || process.env.NODE_ENV === 'development') {
+    return cors({
+      origin: origin || true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    })(req, res, next);
+  }
+
+  // Allow explicitly registered origins
+  if (allowedOrigins.includes(origin)) {
+    return cors({
+      origin,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    })(req, res, next);
+  }
+
+  // Allow same-origin requests dynamically on Render
+  if (req.headers.host) {
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost === req.headers.host) {
+        return cors({
+          origin,
+          credentials: true,
+          methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+          allowedHeaders: ['Content-Type', 'Authorization']
+        })(req, res, next);
       }
-      return callback(new AppError('CORS origin blocked', 403));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  })
-);
+    } catch {
+      // ignore parse error
+    }
+  }
+
+  return next(new AppError('CORS origin blocked', 403));
+});
 
 // Body parsers
 app.use(express.json({ limit: '10mb' }));
